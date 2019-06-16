@@ -1,0 +1,41 @@
+http://themble.com/support/adding-icons-favicons/) -->
+http://www.wtfpl.net/wp-content/themes/bones/favicon.ico
+http://www.wtfpl.net/xmlrpc.php
+http://www.wtfpl.net/wp-content/themes/bones/library/css/style.css' type='text/css' media='all' />
+http://www.wtfpl.net/wp-content/themes/bones/library/css/ie.css' type='text/css' media='all' />
+http://www.wtfpl.net/wp-content/themes/bones/library/js/libs/modernizr.custom.min.js'></script>
+http://www.wtfpl.net/wp-includes/js/jquery/jquery.js'></script>
+http://www.wtfpl.net/wp-includes/js/jquery/jquery-migrate.min.js'></script>
+https://api.w.org/' href='http://www.wtfpl.net/wp-json/' />
+http://www.wtfpl.net/about/
+http://www.wtfpl.net/?p=2' />
+http://www.wtfpl.net/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fwww.wtfpl.net%2Fabout%2F
+http://www.wtfpl.net/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fwww.wtfpl.net%2Fabout%2F&
+http://letusbuzz.com/tweet-share-like-plusone/ -->
+http://www.wtfpl.net/about/
+https://platform.twitter.com/widgets.js
+https://connect.facebook.net/en_US/all.js
+https://apis.google.com/js/plusone.js
+http://static.ak.fbcdn.net/connect.php/js/FB.Share
+https://platform.linkedin.com/in.js
+http://www.wtfpl.net
+http://www.wtfpl.net/
+http://www.wtfpl.net/about/
+http://www.wtfpl.net/blog/
+http://www.wtfpl.net/showcase/
+http://www.wtfpl.net/faq/
+http://www.wtfpl.net/download/
+http://www.wtfpl.net/feedback/
+http://schema.org/BlogPosting
+http://www.wtfpl.net/author/admin/
+http://www.google.com/search?q=bsd+vs+gpl
+http://www.gnu.org/copyleft/gpl.html
+http://www.freebsd.org/copyright/freebsd-license.html
+https://twitter.com/share
+http://www.wtfpl.net/about/
+http://www.wtfpl.net/about/
+http://www.wtfpl.net/about/
+http://www.wtfpl.net/about/
+http://www.facebook.com/sharer.php
+http://www.wtfpl.net/wp-content/themes/bones/library/js/scripts.js'></script>
+http://www.wtfpl.net/wp-includes/js/wp-embed.min.js'></script>

@@ -1,0 +1,102 @@
+http://gmpg.org/xfn/11
+https://www.joelonsoftware.com/xmlrpc.php
+https://www.joelonsoftware.com/feed/
+https://www.joelonsoftware.com/comments/feed/
+https://c0.wp.com/c/5.2.1/wp-includes/css/dist/block-library/style.min.css' type='text/css' media='all' />
+https://6602cxue4uk2h2m2-zippykid.netdna-ssl.com/wp-content/themes/editor-redux/style.css?ver=5.2.1' type='text/css' media='all' />
+https://6602cxue4uk2h2m2-zippykid.netdna-ssl.com/wp-content/themes/editor-redux/inc/fontawesome/font-awesome.css?ver=4.1.0' type='text/css' media='screen' />
+https://6602cxue4uk2h2m2-zippykid.netdna-ssl.com/wp-content/themes/editor-redux/inc/styles/ie.css?ver=1559091807' type='text/css' media='all' />
+https://c0.wp.com/p/jetpack/7.4/css/jetpack.css' type='text/css' media='all' />
+https://c0.wp.com/c/5.2.1/wp-includes/js/jquery/jquery.js'></script>
+https://c0.wp.com/c/5.2.1/wp-includes/js/jquery/jquery-migrate.min.js'></script>
+https://api.w.org/' href='https://www.joelonsoftware.com/wp-json/' />
+https://www.joelonsoftware.com/xmlrpc.php?rsd
+https://www.joelonsoftware.com/wp-includes/wlwmanifest.xml
+https://www.joelonsoftware.com/2003/10/01/01-3/' />
+https://www.joelonsoftware.com/2003/10/10/10/' />
+https://www.joelonsoftware.com/2003/10/08/the-absolute-minimum-every-software-developer-absolutely-positively-must-know-about-unicode-and-character-sets-no-excuses/
+https://wp.me/p83KNI-eH' />
+https://www.joelonsoftware.com/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fwww.joelonsoftware.com%2F2003%2F10%2F08%2Fthe-absolute-minimum-every-software-developer-absolutely-positively-must-know-about-unicode-and-character-sets-no-excuses%2F
+https://www.joelonsoftware.com/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fwww.joelonsoftware.com%2F2003%2F10%2F08%2Fthe-absolute-minimum-every-software-developer-absolutely-positively-must-know-about-unicode-and-character-sets-no-excuses%2F&
+https://www.google-analytics.com/analytics.js','ga');
+https://www.joelonsoftware.com/2003/10/08/the-absolute-minimum-every-software-developer-absolutely-positively-must-know-about-unicode-and-character-sets-no-excuses/
+https://6602cxue4uk2h2m2-zippykid.netdna-ssl.com/wp-content/uploads/2003/10/rose.jpg
+https://i2.wp.com/www.joelonsoftware.com/wp-content/uploads/2016/12/11969842.jpg?fit=32%2C32&
+https://i2.wp.com/www.joelonsoftware.com/wp-content/uploads/2016/12/11969842.jpg?fit=192%2C192&
+https://i2.wp.com/www.joelonsoftware.com/wp-content/uploads/2016/12/11969842.jpg?fit=180%2C180&
+https://i2.wp.com/www.joelonsoftware.com/wp-content/uploads/2016/12/11969842.jpg?fit=270%2C270&
+http://wp.me/PEmnE-Bt
+https://www.joelonsoftware.com/
+https://www.joelonsoftware.com/about-me/
+https://i1.wp.com/www.joelonsoftware.com/wp-content/uploads/2016/12/Pong.png?w=730&
+https://6602cxue4uk2h2m2-zippykid.netdna-ssl.com/wp-content/uploads/2016/12/11969842-1.jpg
+https://www.joelonsoftware.com/about-me/
+https://www.joelonsoftware.com/search-results/
+https://i0.wp.com/www.joelonsoftware.com/wp-content/uploads/2016/12/newdesign-books.png?w=730&
+https://www.joelonsoftware.com/buy-the-books/
+https://i2.wp.com/www.joelonsoftware.com/wp-content/uploads/2016/12/jobs.jpg?w=730&
+http://stackoverflow.com/jobs
+http://stackoverflow.com/jobs/why-jobs
+https://www.stackoverflowbusiness.com/talent
+https://www.stackoverflowbusiness.com/talent/request-a-demo?utm_source=joelonsoftware&utm_medium=referral&utm_term=learn-more
+http://stackoverflow.com
+https://i0.wp.com/www.joelonsoftware.com/wp-content/uploads/2016/12/so-logo.png?w=730&
+http://stackoverflow.com
+http://stackexchange.com
+https://stackoverflow.com/users/story/4
+https://i0.wp.com/stackexchange.com/users/flair/4.png?resize=208%2C58&
+http://fogcreek.com/
+https://i1.wp.com/www.joelonsoftware.com/wp-content/uploads/2016/12/fc-logo.png?w=730&
+http://fogcreek.com/
+http://www.fogcreek.com/fogbugz
+http://trello.com
+https://gomix.com/
+https://twitter.com/spolsky
+https://twitter.com/spolsky
+https://www.joelonsoftware.com/2003/10/08/the-absolute-minimum-every-software-developer-absolutely-positively-must-know-about-unicode-and-character-sets-no-excuses/
+https://www.joelonsoftware.com/author/joelonsoftware/
+https://www.joelonsoftware.com/category/reading-lists/top-10/
+https://www.joelonsoftware.com/category/reading-lists/new-developer/
+https://www.joelonsoftware.com/category/news/
+https://i2.wp.com/www.joelonsoftware.com/wp-content/uploads/2003/10/ibm.jpg?resize=150%2C143&
+http://www.fogcreek.com/FogBUGZ
+http://ca3.php.net/manual/en/language.types.string.php
+https://i0.wp.com/www.joelonsoftware.com/wp-content/uploads/2003/10/ascii.png?resize=274%2C146&
+http://cm.bell-labs.com/cm/cs/cbook/
+http://www.robelle.com/library/smugbook/ascii.html
+https://i2.wp.com/www.joelonsoftware.com/wp-content/uploads/2003/10/oem.png?resize=271%2C209&
+http://www.jimprice.com/ascii-dos.gif
+https://i2.wp.com/www.joelonsoftware.com/wp-content/uploads/2003/10/gimel.png?resize=5%2C9&
+https://i2.wp.com/www.joelonsoftware.com/wp-content/uploads/2003/10/gimel.png?resize=5%2C9&
+https://i2.wp.com/www.joelonsoftware.com/wp-content/uploads/2003/10/gimel.png?resize=5%2C9&
+http://www.i18nguy.com/unicode/codepages.html
+http://www.unicode.org/
+http://msdn.microsoft.com/library/default.asp?url=/library/en-us/intl/unicode_42jv.asp
+https://i0.wp.com/www.joelonsoftware.com/wp-content/uploads/2003/10/hummers.jpg?resize=390%2C61&
+http://www.cl.cam.ac.uk/
+http://www.utf-8.com/
+https://i0.wp.com/www.joelonsoftware.com/wp-content/uploads/2003/10/utf8.png?resize=400%2C63&
+http://www.zvon.org/tmRFC/RFC2279/Output/chapter2.html
+http://www.htmlhelp.com/reference/charset/
+https://i1.wp.com/www.joelonsoftware.com/wp-content/uploads/2003/10/rose.jpg?resize=300%2C225&
+http://www.fogcreek.com/CityDesk
+http://www.fogcreek.com/
+https://www.joelonsoftware.com/navLinks/OtherLanguages.html
+https://www.joelonsoftware.com/
+https://newsblur.com/
+https://www.joelonsoftware.com/feed/
+https://secure.gravatar.com/avatar/d95216e70bed7430716b91ddd6df55fe?s=64&
+https://secure.gravatar.com/avatar/d95216e70bed7430716b91ddd6df55fe?s=128&
+https://trello.com/
+http://www.fogcreek.com/
+http://stackoverflow.com/
+https://www.joelonsoftware.com/2003/10/01/01-3/
+https://www.joelonsoftware.com/2003/10/10/10/
+https://wordpress.org/
+https://c0.wp.com/p/jetpack/7.4/_inc/build/photon/photon.min.js'></script>
+https://s0.wp.com/wp-content/js/devicepx-jetpack.js?ver=201924'></script>
+https://6602cxue4uk2h2m2-zippykid.netdna-ssl.com/wp-content/themes/editor-redux/js/jquery.fitvids.js?ver=20140820'></script>
+https://6602cxue4uk2h2m2-zippykid.netdna-ssl.com/wp-content/themes/editor-redux/js/editor.js?ver=20161202'></script>
+https://c0.wp.com/p/jetpack/7.4/_inc/build/twitter-timeline.min.js'></script>
+https://c0.wp.com/c/5.2.1/wp-includes/js/wp-embed.min.js'></script>
+https://stats.wp.com/e-201924.js' async='async' defer='defer'></script>

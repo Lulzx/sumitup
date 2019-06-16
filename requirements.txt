@@ -1,0 +1,12 @@
+python-telegram-bot
+telegraph
+telethon
+newspaper3k
+markdown2
+readtime
+bs4
+lxml
+requests
+news-please
+readability-lxml
+giveme5w1h
