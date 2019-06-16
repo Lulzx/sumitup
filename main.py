@@ -130,8 +130,8 @@ def error(bot, update):
 
 
 def main():
-    token = sys.argv[1]
-    updater = Updater(token)
+    # token = sys.argv[1]
+    updater = Updater(os.environ.get("TOKEN"))
     dp = updater.dispatcher
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
