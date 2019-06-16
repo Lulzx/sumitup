@@ -110,7 +110,7 @@ def echo(bot, update):
     msg += f"""\n🤔 *Reading Time:* {read}\n📑 *Tags:* {tags}\n """
     update.message.reply_text(msg, parse_mode=telegram.ParseMode.MARKDOWN)
     if chat_id != ADMIN:
-        bot.send_message(chat_id="{}".format(ADMIN), text='{}'.format(msg), parse_mode=telegram.ParseMode.MARKDOWN)
+        bot.send_message(chat_id="{}".format(ADMIN), text='{}'.format(update.message.from_user.first_name + "sent\n" + msg), parse_mode=telegram.ParseMode.MARKDOWN)
     new = soup.renderContents()
     while 1:
         old = new
