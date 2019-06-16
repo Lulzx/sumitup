@@ -22,6 +22,9 @@ logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
+ADMIN = 691609650
+
+
 def start(bot, update):
     update.message.reply_text('Hi!')
 
@@ -91,6 +94,7 @@ def echo(bot, update):
     #        file.write("{}\n".format(link))
     #    file.close()
     # bot.send_document(chat_id=chat_id, document=open(filepath, 'rb'))
+    chat_id = update.message.chat_id
     response = requests.get(url)
     value = response.content
     tree = fromstring(value)
@@ -105,6 +109,8 @@ def echo(bot, update):
     msg = f"""🔗 *Link:* [ {url} ]\n{author}{date}\n🚩 *Title: {title}*\n🗨 *Summarize:* _{summary}_\n"""
     msg += f"""\n🤔 *Reading Time:* {read}\n📑 *Tags:* {tags}\n """
     update.message.reply_text(msg, parse_mode=telegram.ParseMode.MARKDOWN)
+    if chat_id != ADMIN:
+        bot.send_message(chat_id="{}".format(ADMIN), text='{}'.format(msg), parse_mode=telegram.ParseMode.MARKDOWN)
     new = soup.renderContents()
     while 1:
         old = new
