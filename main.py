@@ -18,7 +18,7 @@ from telegraph import Telegraph
 from lxml.html import fromstring
 from lxml.html.clean import clean_html, unicode
 
-logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.DEBUG)
+logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
