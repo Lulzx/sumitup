@@ -26,7 +26,7 @@ ADMIN = 691609650
 
 
 def start(bot, update):
-    update.message.reply_text('Hi!')
+    update.message.reply_text('Hi! Send me a link.')
 
 
 def find(string):
