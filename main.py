@@ -21,7 +21,10 @@ from lxml.html.clean import clean_html
 from newspaper import Article
 from requests.compat import urlparse, quote_plus
 from requests_toolbelt import MultipartEncoder
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup
+import sqlite3
+from tabulate import tabulate
 # from telegraph import Telegraph
 
 ADMIN = 691609650
@@ -843,7 +846,10 @@ class TelegraphPoster(object):
 # noinspection PyBroadException
 def echo(bot, update):
     links = find(update.message.text)
-    url = links[0]
+    try:
+        url = links[0]
+    except:
+        update.message.reply_text("Oh! Send a valid link.")
     article = Article(url)
     article.download()
     article.parse()
@@ -895,7 +901,12 @@ def echo(bot, update):
     [s.extract() for s in soup('style')]
     msg = f"""🔗 *Link:* [ {url} ]\n{author}{date}\n🚩 *Title: {title}*\n🗨 *Summarize:* _{summary}_\n"""
     msg += f"""\n🤔 *Reading Time:* {read}\n📑 *Tags:* {tags}\n """
-    update.message.reply_text(msg, parse_mode=telegram.ParseMode.MARKDOWN)
+    button_list=[
+        InlineKeyboardButton('Add to reading list',callback_data=1),
+        InlineKeyboardButton('Mushroom Pizza',callback_data=2)
+    ]
+    reply_markup=InlineKeyboardMarkup(build_menu(button_list,n_cols=2))
+    update.message.reply_text(msg, parse_mode=telegram.ParseMode.MARKDOWN, reply_markup=reply_markup)
     if update.message.chat_id != ADMIN:
         bot.send_message(chat_id="{}".format(ADMIN), text='{}'.format(update.message.from_user.first_name + " *sent:*\n" + msg), parse_mode=telegram.ParseMode.MARKDOWN)
     new = soup.renderContents()
@@ -921,6 +932,99 @@ def echo(bot, update):
     update.message.reply_text(link)
 
 
+def register(bot,update):
+    bot.send_chat_action(chat_id=update.effective_user.id, action=telegram.ChatAction.TYPING)
+    bot.send_message(chat_id=update.message.chat_id,text='Enter your details in the following format : '
+                                                         'Name, Address, Phone number')
+
+def database(user_id,customer_name,address,phone_number):
+    print(user_id,customer_name,address,phone_number)
+    connection.execute('''CREATE TABLE IF NOT EXISTS userdetails(user_id int,customer_name text,address text,phone_number int )''')
+    connection.execute("INSERT INTO userdetails VALUES (?,?,?,?)",(user_id,customer_name,address,phone_number))
+    connection.commit()
+
+#Function to save user details in the database
+def saveuserDetails(bot,update):
+    user_id=update.message.from_user.id
+    customer_name,address,phone_number=update.message.text.split(',')
+    database(user_id,customer_name,address,phone_number)
+
+ #Function to ask user about type of pizza he wants to order
+def pizzatype(bot,update):
+    reply_markup = telegram.ReplyKeyboardRemove()
+
+    print("message sent by user",update.message.text)
+    if update.message.text == 'Veg':
+        vegpizzaoptions(bot,update)
+    elif update.message.text =='Non Veg':
+        nonvegpizzaoptions(bot,update)
+
+def vegpizzaoptions(bot,update):
+    print("inside vegpizaa method")
+    #button_labels = connection.execute("SELECT name from pizza_details where type=='VEG'")
+    for row in connection.execute("SELECT name from pizza_details where type=='VEG'"):
+     print(row)
+    #print("Button labesl ",button_labels)
+    #button_list=[InlineKeyboardButton(button_labels,callback_data=1)]
+    #reply_markup=InlineKeyboardMarkup(build_menu(button_list,n_cols=len(button_labels)))
+    #update.message.reply_text("Please choose from the following : ",reply_markup=reply_markup)
+    #bot.send_message(chat_id=update.message.chat_id, text='Choose from the following',reply_markup=reply_markup)
+
+def nonvegpizzaoptions(bot,update):
+    for row in connection.execute("SELECT name from pizza_details where type=='NonVeg'"):
+     button_labels = row
+    print("Button Labels", button_labels)
+    button_list=[
+            InlineKeyboardButton('Cheese Chicken ',callback_data=1),
+            InlineKeyboardButton('Mushroom Chicken ',callback_data=2)]
+    reply_markup=InlineKeyboardMarkup(build_menu(button_list,n_cols=2))
+    #update.message.reply_text("Please choose from the following : ",reply_markup=reply_markup)
+    bot.send_message(chat_id=update.message.chat_id, text='Choose from the following',reply_markup=reply_markup)
+
+#Function to cancel the order by text
+def cancelorder(bot,update):
+    cancel_order_list=['Cancel my order','I dont want this order','Cancel it','Don\'t feel hungry now' ]
+    for text in cancel_order_list:
+     if update.message.text.lower()==text.lower():
+      bot.send_message(chat_id=update.message.chat_id, text='Your order has been cancelled')
+
+# Function to check the userdetails initiated by user on /checkdetails command
+def checkDetails(bot,update):
+    value = update.message.from_user.id
+    print("VALUE : ", value)
+    for row in connection.execute("SELECT *from userdetails WHERE user_id=?", (value,)):
+        print(row)
+        user_id, customer_name, address, phone_number = row
+    labels=["Customer Name : ","Address : ","Phone Number : "]
+    data=[customer_name, address, phone_number]
+    table=zip(labels,data)
+    list=tabulate(table,tablefmt="fancy_grid")
+    bot.send_message(chat_id=update.message.chat_id,text=list)
+
+#FUNCTION FOR ORDERING PIZZA
+def orderpizza(bot,update):
+    button_labels = [['Veg'], ['Non Veg']]
+    reply_keyboard = telegram.ReplyKeyboardMarkup(button_labels)
+    bot.send_chat_action(chat_id=update.effective_user.id, action=telegram.ChatAction.TYPING)
+    bot.send_message(chat_id=update.message.chat_id,text='Which type of pizza you want',reply_markup=reply_keyboard)
+
+def button(bot,update):
+    query=update.callback_query
+    bot.send_chat_action(chat_id=update.effective_user.id,action=telegram.ChatAction.TYPING)
+    bot.edit_message_text(text="Your order is received and will be delivered within 30 mins",chat_id=query.message.chat_id,message_id=query.message.message_id)
+
+def build_menu(buttons,n_cols,header_buttons=None,footer_buttons=None):
+    menu = [buttons[i:i + n_cols] for i in range(0, len(buttons), n_cols)]
+    if header_buttons:
+        menu.insert(0, header_buttons)
+    if footer_buttons:
+        menu.append(footer_buttons)
+    return menu
+
+def offers():
+    connection.execute('SELECT offers from offerTable')
+
+
 def error(bot, update):
     logger.warning('Update "%s" caused error "%s"' % (update, error))
 
@@ -934,6 +1038,16 @@ def main():
     dp = updater.dispatcher
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
+    dp.add_handler(CommandHandler('register',register))
+    dp.add_handler(CommandHandler('checkdetails',checkDetails))
+    dp.add_handler(CommandHandler('order',orderpizza))
+    dp.add_handler(CommandHandler('offers',offers))
+
+    dp.add_handler(MessageHandler(Filters.text, saveuserDetails),group=0)
+    dp.add_handler(MessageHandler(Filters.text, pizzatype),group=1)
+    dp.add_handler(MessageHandler(Filters.text, cancelorder),group=2)
+    dp.add_handler((CallbackQueryHandler(button)))
+    # dp.add_handler(CommandHandler("sum", pass_args=True))
     dp.add_handler(MessageHandler(Filters.text, echo))
     dp.add_error_handler(error)
     updater.start_polling()
@@ -943,3 +1057,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+'''def callback(bot, update, args):
+    input = " ".join(args)
+    update.message.reply_text("You said: " + input)'''
