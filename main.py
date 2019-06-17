@@ -1042,7 +1042,7 @@ def main():
     dp = updater.dispatcher
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
-    dp.add_handler(CommandHandler('register',register, pass_args=True))
+    # dp.add_handler(CommandHandler('register',register, pass_args=True))
     dp.add_handler(CommandHandler('checkdetails',checkDetails))
     dp.add_handler(CommandHandler('order',orderpizza))
     dp.add_handler(CommandHandler('offers',offers))
