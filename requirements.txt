@@ -1,9 +1,9 @@
 python-telegram-bot
 telegraph
-telethon
 newspaper3k
 markdown2
 readtime
 bs4
 lxml
 requests
+requests_toolbelt
