@@ -53,7 +53,7 @@ logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
-connection = sqlite3.connect(':memory:')
+connection = sqlite3.connect(':memory:', check_same_thread=False)
 c = connection.cursor()
 
 class Error(Exception):
@@ -906,7 +906,7 @@ def echo(bot, update):
     msg += f"""\n🤔 *Reading Time:* {read}\n📑 *Tags:* {tags}\n """
     button_list=[
         InlineKeyboardButton('Add to reading list',callback_data=1),
-        InlineKeyboardButton('Mushroom Pizza',callback_data=2)
+        InlineKeyboardButton('Do something',callback_data=2)
     ]
     reply_markup=InlineKeyboardMarkup(build_menu(button_list,n_cols=2))
     update.message.reply_text(msg, parse_mode=telegram.ParseMode.MARKDOWN, reply_markup=reply_markup)
