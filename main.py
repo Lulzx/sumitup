@@ -935,11 +935,11 @@ def echo(bot, update):
     update.message.reply_text(link)
 
 
-def register(bot,update):
+'''def register(bot,update):
     bot.send_chat_action(chat_id=update.effective_user.id, action=telegram.ChatAction.TYPING)
     bot.send_message(chat_id=update.message.chat_id,text='Enter your details in the following format : '
                                                          'Name, Address, Phone number')
-
+'''
 def database(user_id,customer_name,address,phone_number):
     print(user_id,customer_name,address,phone_number)
     c.execute('''CREATE TABLE IF NOT EXISTS userdetails(user_id int,customer_name text,address text,phone_number int )''')
@@ -947,9 +947,10 @@ def database(user_id,customer_name,address,phone_number):
     connection.commit()
 
 #Function to save user details in the database
-def saveuserDetails(bot,update):
+def saveuserDetails(bot,update, args):
     user_id=update.message.from_user.id
-    customer_name,address,phone_number=update.message.text.split(',')
+    input = " ".join(args)
+    customer_name,address,phone_number=input.split(',')
     database(user_id,customer_name,address,phone_number)
 
  #Function to ask user about type of pizza he wants to order
@@ -1041,12 +1042,12 @@ def main():
     dp = updater.dispatcher
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
-    dp.add_handler(CommandHandler('register',register))
+    dp.add_handler(CommandHandler('register',register, pass_args=True))
     dp.add_handler(CommandHandler('checkdetails',checkDetails))
     dp.add_handler(CommandHandler('order',orderpizza))
     dp.add_handler(CommandHandler('offers',offers))
 
-    dp.add_handler(MessageHandler(Filters.text, saveuserDetails),group=0)
+    dp.add_handler(CommandHandler('save', saveuserDetails),group=0)
     dp.add_handler(MessageHandler(Filters.text, pizzatype),group=1)
     dp.add_handler(MessageHandler(Filters.text, cancelorder),group=2)
     dp.add_handler((CallbackQueryHandler(button)))
@@ -1060,7 +1061,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-'''def callback(bot, update, args):
-    input = " ".join(args)
-    update.message.reply_text("You said: " + input)'''
