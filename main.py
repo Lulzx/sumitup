@@ -49,9 +49,12 @@ line_breaks_and_empty_strings = re.compile('(\s{2,}|\s*\r?\n\s*)')
 header_re = re.compile(r'<head[^a-z][\s\S]*</head>')
 
 
-logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
+logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
+
+connection = sqlite3.connect(':memory:')
+c = connection.cursor()
 
 class Error(Exception):
     pass
@@ -939,8 +942,8 @@ def register(bot,update):
 
 def database(user_id,customer_name,address,phone_number):
     print(user_id,customer_name,address,phone_number)
-    connection.execute('''CREATE TABLE IF NOT EXISTS userdetails(user_id int,customer_name text,address text,phone_number int )''')
-    connection.execute("INSERT INTO userdetails VALUES (?,?,?,?)",(user_id,customer_name,address,phone_number))
+    c.execute('''CREATE TABLE IF NOT EXISTS userdetails(user_id int,customer_name text,address text,phone_number int )''')
+    c.execute("INSERT INTO userdetails VALUES (?,?,?,?)",(user_id,customer_name,address,phone_number))
     connection.commit()
 
 #Function to save user details in the database
@@ -962,7 +965,7 @@ def pizzatype(bot,update):
 def vegpizzaoptions(bot,update):
     print("inside vegpizaa method")
     #button_labels = connection.execute("SELECT name from pizza_details where type=='VEG'")
-    for row in connection.execute("SELECT name from pizza_details where type=='VEG'"):
+    for row in c.execute("SELECT name from pizza_details where type=='VEG'"):
      print(row)
     #print("Button labesl ",button_labels)
     #button_list=[InlineKeyboardButton(button_labels,callback_data=1)]
@@ -971,7 +974,7 @@ def vegpizzaoptions(bot,update):
     #bot.send_message(chat_id=update.message.chat_id, text='Choose from the following',reply_markup=reply_markup)
 
 def nonvegpizzaoptions(bot,update):
-    for row in connection.execute("SELECT name from pizza_details where type=='NonVeg'"):
+    for row in c.execute("SELECT name from pizza_details where type=='NonVeg'"):
      button_labels = row
     print("Button Labels", button_labels)
     button_list=[
@@ -992,7 +995,7 @@ def cancelorder(bot,update):
 def checkDetails(bot,update):
     value = update.message.from_user.id
     print("VALUE : ", value)
-    for row in connection.execute("SELECT *from userdetails WHERE user_id=?", (value,)):
+    for row in c.execute("SELECT *from userdetails WHERE user_id=?", (value,)):
         print(row)
         user_id, customer_name, address, phone_number = row
     labels=["Customer Name : ","Address : ","Phone Number : "]
@@ -1022,7 +1025,7 @@ def build_menu(buttons,n_cols,header_buttons=None,footer_buttons=None):
     return menu
 
 def offers():
-    connection.execute('SELECT offers from offerTable')
+    c.execute('SELECT offers from offerTable')
 
 
 def error(bot, update):
