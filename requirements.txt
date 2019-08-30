@@ -1,4 +1,4 @@
-python-telegram-bot==12.0.0b1
+python-telegram-bot
 telegraph
 newspaper3k
 markdown2
