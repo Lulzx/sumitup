@@ -20,7 +20,7 @@ logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-def start(bot, update):
+def start(update, context):
     update.message.reply_text('Hi! Send me a link.')
 
 
@@ -29,13 +29,13 @@ def find(string):
     return url
 
 
-def help(bot, update):
+def help(update, context):
     update.message.reply_text('Help!')
 
 
-def button(bot, update):
+def button(update, context):
     query = update.callback_query
-    bot.answer_callback_query(query.id, text="The article has been added to your reading list.", show_alert=False)
+    context.bot.answer_callback_query(query.id, text="The article has been added to your reading list.", show_alert=False)
 
 
 def build_menu(buttons, n_cols, header_buttons=None, footer_buttons=None):
@@ -48,7 +48,7 @@ def build_menu(buttons, n_cols, header_buttons=None, footer_buttons=None):
 
 
 # noinspection PyBroadException
-def process(bot, update):
+def process(update, context):
     links = find(update.message.text)
     try:
         url = links[0]
@@ -86,7 +86,7 @@ def process(bot, update):
     #    for link in links:
     #        file.write("{}\n".format(link))
     #    file.close()
-    # bot.send_document(chat_id=chat_id, document=open(filepath, 'rb'))
+    # context.bot.send_document(chat_id=chat_id, document=open(filepath, 'rb'))
     value = article.html
     tree = fromstring(value)
     title = str(tree.findtext('.//title'))
@@ -101,13 +101,13 @@ def process(bot, update):
     reply_markup = InlineKeyboardMarkup(build_menu(button_list, n_cols=2))
     update.message.reply_text(msg, parse_mode=telegram.ParseMode.MARKDOWN, reply_markup=reply_markup)
     if update.message.chat_id != ADMIN:
-        bot.send_message(chat_id="{}".format(ADMIN),
+        context.bot.send_message(chat_id="{}".format(ADMIN),
                          text='{}'.format(update.message.from_user.first_name + " *sent:*\n" + msg),
                          parse_mode=telegram.ParseMode.MARKDOWN)
 
 
-def error(bot, update):
-    logger.warning('Update "%s" caused error "%s"' % (update, error))
+def error(update, context):
+    logger.warning('Update "%s" caused error "%s"' % (update, context.error))
 
 
 def main():
@@ -115,7 +115,7 @@ def main():
         token = sys.argv[1]
     except IndexError:
         token = os.environ.get("TOKEN")
-    updater = Updater(token)
+    updater = Updater(token, use_context=True)
     dp = updater.dispatcher
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
