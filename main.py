@@ -51,7 +51,7 @@ def build_menu(buttons, n_cols, header_buttons=None, footer_buttons=None):
 def process(update, context):
     links = find(update.message.text)
     # handling for groups, when message has no links
-    if links == [] and update.message.chat.type == "group":
+    if links == [] and update.message.chat.type == "supergroup":
         return
     try:
         url = links[0]
