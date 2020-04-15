@@ -115,7 +115,6 @@ def main():
         token = sys.argv[1]
     except IndexError:
         token = os.environ.get("TOKEN")
-    PORT = int(os.environ.get('PORT', '8443'))
     updater = Updater(token, use_context=True)
     dp = updater.dispatcher
     dp.add_handler(CommandHandler("start", start))
@@ -123,10 +122,7 @@ def main():
     dp.add_handler((CallbackQueryHandler(button)))
     dp.add_handler(MessageHandler(Filters.text, process))
     dp.add_error_handler(error)
-    updater.start_webhook(listen="0.0.0.0",
-                      port=PORT,
-                      url_path=token)
-    updater.bot.set_webhook("https://sumitup.herokuapp.com/" + token)
+    updater.start_polling()
     logger.info("Ready to rock..!")
     updater.idle()
 
