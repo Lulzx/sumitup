@@ -16,7 +16,7 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Callb
 
 ADMIN = 691609650
 
-logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
+logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
