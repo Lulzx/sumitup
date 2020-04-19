@@ -13,15 +13,120 @@ from newspaper import Article
 import urllib.parse
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
+from googletrans import Translator
+from html.parser import HTMLParser
+import emoji
+import re
+import json
+import requests
+from readability import Document
+from lxml.html import fromstring
+from bs4 import BeautifulSoup as bs
+from requests.compat import urljoin
+from functools import reduce
+from html_telegraph_poster import TelegraphPoster
 
 ADMIN = 691609650
+text_nodes = 0
+text_strings = []
+markup = """"""
+url = ""
+translator = Translator()
 
-logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.DEBUG)
+logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
 def start(update, context):
     update.message.reply_text('Hi! Send me a link.')
+
+
+class MyHTMLParser(HTMLParser):
+    def handle_starttag(self, tag, attrs):
+        if tag not in ['a','aside','b','blockquote','br','code','em','figcaption','figure','h3','h4','hr','i','iframe','img','li','ol','p','pre','s','strong','u','ul','video']:
+            return
+        # print("Start tag:", tag)
+        global markup
+        markup += " <" + tag
+        for attr in attrs:
+            attribute = ""
+            if attr[0] in ['src', 'href']:
+                global url
+                href = attr[1]
+                attribute += urljoin(url, href)
+                markup += " {0}='{1}'".format(attr[0], attribute)
+            # print("     attr:", attr)
+        markup += ">"
+
+    def handle_endtag(self, tag):
+        if tag not in ['a','aside','b','blockquote','br','code','em','figcaption','figure','h3','h4','hr','i','iframe','img','li','ol','p','pre','s','strong','u','ul','video']:
+            return
+        global markup
+        markup += "</{}>".format(tag)
+        # print("End tag  :", tag)
+
+    def handle_data(self, data):
+        global text_nodes
+        global text_strings
+        global markup
+        markup += " {" + str(text_nodes) + "}"
+        scheme = [data]
+        text_strings.extend(scheme)
+        # print("Data     :", data + " ====> {}".format(text_nodes))
+        text_nodes += 1
+
+
+
+def translate(link):
+
+    global url
+    global text_nodes
+    global text_strings
+    global markup
+
+    dest = "en"
+    url = link
+    parser = MyHTMLParser()
+    response = requests.get(url)
+    doc = Document(response.text)
+    # tree = fromstring(r.content)
+    title = doc.title() # tree.findtext('.//title')
+    lang = translator.detect(title).lang
+    if lang == 'en':
+        # print("The article appears to be in English already.")
+        return 'null'
+    title = translator.translate(title).text
+    content = doc.summary()
+    #print(content)
+    soup = bs(content, 'lxml')
+    text = str(soup.find('body'))
+    # text = r.text.split('<body')[1].split('</body>')[0]
+    repls = ('h1>', 'h3>'), ('h2>', 'h3>'), ('<h1', '<h3'), ('<h2', '<h3')
+    text = reduce(lambda a, kv: a.replace(*kv), repls, text)
+    text = emoji.get_emoji_regexp().sub(r'', text) # removing the emojis
+    # print(text)
+    parser.feed(text)
+    # print("text_nodes: ", text_nodes)
+    # print(text_strings)
+    # print(text)
+    # print(markup)
+    # print("STARTING TO TRANSLATE...", url)
+    translations = translator.translate(text_strings, dest=str(dest))
+    final_payload = []
+    for translation in translations:
+        scheme = [translation.text]
+        # print(translation.origin, ' -> ', scheme[0])
+        final_payload.extend(scheme)
+    markup = markup.format(*final_payload)
+    markup = re.sub(r'\s([?.!"](?:\s|$))', r'\1', markup)
+    print("\n")
+    #print(markup)
+    t = TelegraphPoster(access_token='0010fae64146e64e1f145470b866afc43e1f2221834eeffc8f3e4a901ac7')
+    article = t.post(title=str(title), author='lulz', text=str(markup))
+    x = str(article).replace("'", '"')
+    article = json.loads(x)
+    text="Your article is ready to read! {}".format(article['url'])
+    return text
 
 
 def find(string):
@@ -51,7 +156,7 @@ def build_menu(buttons, n_cols, header_buttons=None, footer_buttons=None):
 def process(update, context):
     links = find(update.message.text)
     # handling for groups, when message has no links
-    if links == [] and update.message.chat.type == "supergroup":
+    if links == []: #and update.message.chat.type == "supergroup":
         return
     try:
         url = links[0]
@@ -79,6 +184,10 @@ def process(update, context):
     for keyword in keywords:
         tags += " #" + keyword
     summary = article.summary
+    summary_points = ""
+    for x in summary.splitlines():
+        summary_points += "↦️ " + x + "\n"
+    summary = summary_points
     read = readtime.of_text(text)
     # html = article.html
     # links = find(html_content)
@@ -93,8 +202,9 @@ def process(update, context):
     value = article.html
     tree = fromstring(value)
     title = str(tree.findtext('.//title'))
-    msg = f"""🔗 *Link:* {url}\n{author}{date}\n🚩 *Title: {title}*\n🗨 *Summarize:* _{summary}_\n"""
-    msg += f"""\n🤔 *Reading Time:* {read}\n📑 *Tags:* {tags}\n """
+    msg = f"""🔗 *Link:* {url}\n{author}{date}\n🚩 *Title: {title}*\n\n🗨 *Summary:*\n _{summary}_\n"""
+    msg += f"""🤔 *Reading Time:* {read}\n""".replace("min", "mins")
+    msg += f"""📑 *Tags:* {tags}\n """
     query = urllib.parse.quote(msg.replace('*', '**').replace('_', '__'))
     share_url = 'tg://msg_url?url=' + query
     button_list = [
@@ -103,6 +213,12 @@ def process(update, context):
     ]
     reply_markup = InlineKeyboardMarkup(build_menu(button_list, n_cols=2))
     update.message.reply_text(msg, parse_mode=telegram.ParseMode.MARKDOWN, reply_markup=reply_markup)
+    lang = translator.detect(title).lang
+    if lang is not 'en':
+        text = translate(url)
+        if text == 'null':
+            return
+        update.message.reply_text(text)
     if update.message.chat_id != ADMIN:
         context.bot.send_message(chat_id="{}".format(ADMIN),
                          text='{}'.format(update.message.from_user.first_name + " *sent:*\n" + msg),
@@ -125,7 +241,7 @@ def main():
     dp.add_handler((CallbackQueryHandler(button)))
     dp.add_handler(MessageHandler(Filters.text, process))
     dp.add_error_handler(error)
-    updater.start_polling()
+    updater.start_polling(clean=True, timeout=99999)
     logger.info("Ready to rock..!")
     updater.idle()
 
