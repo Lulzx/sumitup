@@ -8,3 +8,7 @@ lxml
 requests
 requests_toolbelt
 tabulate
+googletrans
+emoji
+readability-lxml
+html_telegraph_poster
