@@ -214,7 +214,7 @@ def process(update, context):
     reply_markup = InlineKeyboardMarkup(build_menu(button_list, n_cols=2))
     update.message.reply_text(msg, parse_mode=telegram.ParseMode.MARKDOWN, reply_markup=reply_markup)
     lang = translator.detect(title).lang
-    if lang is not 'en':
+    if lang != 'en':
         text = translate(url)
         if text == 'null':
             return
