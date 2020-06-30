@@ -177,6 +177,19 @@ def process(update, context):
             date = ""
         else:
             date += str(article.publish_date)
+    value = article.html
+    tree = fromstring(value)
+    title = str(tree.findtext('.//title'))
+    lang = translator.detect(title).lang
+    if lang != 'en':
+        text = translate(url)
+        if text == 'null':
+            return
+        update.message.reply_text(text)
+        url = find(text)[0]
+        article = Article(url)
+        article.download()
+        article.parse()
     text = article.text
     article.nlp()
     keywords = article.keywords
@@ -189,19 +202,7 @@ def process(update, context):
         summary_points += "↦️ " + x + "\n"
     summary = summary_points
     read = readtime.of_text(text)
-    # html = article.html
-    # links = find(html_content)
-    # update_id = update.update_id
-    # chat_id = update.message.chat_id
-    # filepath = r"C:/Users/Lulzx/Documents/sumitup-master/temp/{}.txt".format(update_id)
-    # with open(filepath, "w+") as file:
-    #    for link in links:
-    #        file.write("{}\n".format(link))
-    #    file.close()
-    # context.bot.send_document(chat_id=chat_id, document=open(filepath, 'rb'))
-    value = article.html
-    tree = fromstring(value)
-    title = str(tree.findtext('.//title'))
+    
     msg = f"""🔗 *Link:* {url}\n{author}{date}\n🚩 *Title: {title}*\n\n🗨 *Summary:*\n _{summary}_\n"""
     msg += f"""🤔 *Reading Time:* {read}\n""".replace("min", "mins")
     msg += f"""📑 *Tags:* {tags}\n """
@@ -213,12 +214,7 @@ def process(update, context):
     ]
     reply_markup = InlineKeyboardMarkup(build_menu(button_list, n_cols=2))
     update.message.reply_text(msg, parse_mode=telegram.ParseMode.MARKDOWN, reply_markup=reply_markup)
-    lang = translator.detect(title).lang
-    if lang != 'en':
-        text = translate(url)
-        if text == 'null':
-            return
-        update.message.reply_text(text)
+
     if update.message.chat_id != ADMIN:
         context.bot.send_message(chat_id="{}".format(ADMIN),
                          text='{}'.format(update.message.from_user.first_name + " *sent:*\n" + msg),
