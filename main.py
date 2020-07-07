@@ -134,6 +134,48 @@ def find(string):
     return url
 
 
+def screenshot(update, context):
+    chat_id = update.message.chat_id
+    url = context.args[0]
+    photo = "https://api.microlink.io/?url={}&waitUntil=networkidle2&screenshot=true&meta=false&embed=screenshot.url".format(url)
+    context.bot.send_photo(chat_id=chat_id, photo=photo)
+
+
+def fullshot(update, context):
+    chat_id = update.message.chat_id
+    url = context.args[0]
+    file = "https://api.microlink.io/?url={}&waitUntil=networkidle2&screenshot=true&meta=false&embed=screenshot.url&fullPage=true".format(url)
+    context.bot.send_document(chat_id=chat_id, document=file)
+
+
+def pdf(update, context):
+    chat_id = update.message.chat_id
+    url = context.args[0]
+    file = "https://api.microlink.io/?url={}&pdf&embed=pdf.url&scale=1&margin=0.4cm".format(url)
+    context.bot.send_document(chat_id=chat_id, document=file)
+
+
+def technologies(update, context):
+    chat_id = update.message.chat_id
+    link = context.args[0]
+    url = "https://api.microlink.io/?url={}&meta=false&insights.lighthouse=false&insights.technologies=true".format(link)
+    result = requests.get(url).json()
+
+    tech_list = result['data']['insights']['technologies']
+    len_tech = len(tech_list)
+    string = ""
+    if len_tech > 1:
+        for n, tech in enumerate(tech_list):
+            if n < len_tech - 1:
+                string += "├ " + str(tech['name']) + ' - ' + str(tech['categories'][0]) + "\n"
+            else:
+                string += "└ " + str(tech['name']) + ' - ' + str(tech['categories'][0])
+    else:
+        string += "└ "+ str(tech_list[0]['name']) + ' - ' + str(tech_list[0]['categories'][0]) + "\n"
+
+    context.bot.send_message(chat_id=chat_id, text="<b>Detected {} technologies behind the site:</b>\n{}".format(len_tech, string), parse_mode=telegram.ParseMode.HTML)
+
+
 def help(update, context):
     update.message.reply_text('Help!')
 
@@ -235,6 +277,10 @@ def main():
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler((CallbackQueryHandler(button)))
+    dp.add_handler(CommandHandler("scr", screenshot))
+    dp.add_handler(CommandHandler("full", fullshot))
+    dp.add_handler(CommandHandler("pdf", pdf))
+    dp.add_handler(CommandHandler("tech", technologies))
     dp.add_handler(MessageHandler(Filters.text, process))
     dp.add_error_handler(error)
     updater.start_polling(clean=True, timeout=99999)
