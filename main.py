@@ -76,6 +76,35 @@ class MyHTMLParser(HTMLParser):
         text_nodes += 1
 
 
+def qa(question, passage):
+    data = {"model":"bidaf-elmo","passage": passage ,"question": question}
+    r = requests.post('https://demo.allennlp.org/api/bidaf-elmo/predict', json=data).json()
+    return r["best_span_str"]
+
+
+def add(update, context):
+    chat_id = update.message.chat_id
+    text = ' '.join(context.args)
+    context.bot.send_message(chat_id=chat_id, text="Added to queue! processing...")
+    links = find(text)
+    if links == []: #and update.message.chat.type == "supergroup":
+        pass
+    else:
+        url = links[0]
+        text = requests.get(url).text
+    context.chat_data[chat_id] = text
+    context.bot.send_message(chat_id=chat_id, text="Ready! 👍🏻")
+
+
+def ask(update, context):
+    chat_id = update.message.chat_id
+    question = ' '.join(context.args)
+    try:
+        passage = update.message.reply_to_message.text
+    except:
+        passage = context.chat_data[chat_id]
+    response = qa(question, passage)
+    context.bot.send_message(chat_id=chat_id, text=response, reply_to_message_id=update.message.message_id)
 
 def translate(link):
 
@@ -177,7 +206,13 @@ def technologies(update, context):
 
 
 def help(update, context):
-    update.message.reply_text('Help!')
+    update.message.reply_text("""commands
+
+pdf - export url as pdf
+scr - screenshot of the webpage
+full - full page screenshot of webpage
+add - store the passage to ask questions from
+ask - followed by question you want to ask (can be used as reply too)""")
 
 
 def button(update, context):
@@ -280,6 +315,8 @@ def main():
     dp.add_handler(CommandHandler("scr", screenshot))
     dp.add_handler(CommandHandler("full", fullshot))
     dp.add_handler(CommandHandler("pdf", pdf))
+    dp.add_handler(CommandHandler("add", add))
+    dp.add_handler(CommandHandler("ask", ask))
     dp.add_handler(CommandHandler("tech", technologies))
     dp.add_handler(MessageHandler(Filters.text, process))
     dp.add_error_handler(error)
