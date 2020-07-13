@@ -5,7 +5,7 @@ import logging
 import os
 import re
 import sys
-
+import nltk
 import readtime
 import telegram
 from lxml.html import fromstring
@@ -36,6 +36,8 @@ translator = Translator()
 
 logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+nltk.download('punkt')
 
 
 def start(update, context):
@@ -308,7 +310,10 @@ def process(update, context):
     soup = bs(value, 'lxml')
     outline = ""
     for heading in soup.find_all(["h1", "h2", "h3", "h4", "h5", "h6"]):
-    	outline += int(heading.name[1:])*' ' + '- ' + heading.text.strip() + '\n'
+    	heading_text = heading.text.strip()
+    	if heading.name in ["h1", "h2"]:
+    		heading_text = f"*{heading_text}*"
+    	outline += int(heading.name[1:])*' ' + '- ' + heading_text + '\n'
     article.nlp()
     keywords = article.keywords
     tags = ""
