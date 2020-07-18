@@ -1,33 +1,32 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import json
 import logging
 import os
 import re
 import sys
+import urllib.parse
+from functools import reduce
+from html.parser import HTMLParser
+
+import emoji
 import nltk
 import readtime
+import requests
 import telegram
+from bs4 import BeautifulSoup as bs
+from googletrans import Translator
+from html_telegraph_poster import TelegraphPoster
 from lxml.html import fromstring
 from newspaper import Article
-import urllib.parse
+from readability import Document
+from requests.compat import urljoin
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (Updater, CommandHandler,
                           MessageHandler, Filters, CallbackQueryHandler)
-from googletrans import Translator
-from html.parser import HTMLParser
-import emoji
-import re
-import json
-import requests
-from readability import Document
-from lxml.html import fromstring
-from bs4 import BeautifulSoup as bs
-from requests.compat import urljoin
-from functools import reduce
-from html_telegraph_poster import TelegraphPoster
 
-ADMIN = 691609650
+ADMIN: int = 691609650
 text_nodes = 0
 text_strings = []
 markup = """"""
@@ -50,7 +49,7 @@ add - store the passage to ask questions from
 ask - followed by question you want to ask (can be used as reply too)""")
 
 
-class MyHTMLParser(HTMLParser):
+class html_parser(HTMLParser):
     def handle_starttag(self, tag, attrs):
         if tag not in [
             'a', 'aside', 'b', 'blockquote',
@@ -58,7 +57,7 @@ class MyHTMLParser(HTMLParser):
             'figure', 'h3', 'h4', 'hr',
             'i', 'iframe', 'img', 'li',
             'ol', 'p', 'pre', 's',
-                'strong', 'u', 'ul', 'video']:
+            'strong', 'u', 'ul', 'video']:
             return
         # print("Start tag:", tag)
         global markup
@@ -80,7 +79,7 @@ class MyHTMLParser(HTMLParser):
             'figure', 'h3', 'h4', 'hr',
             'i', 'iframe', 'img', 'li',
             'ol', 'p', 'pre', 's',
-                'strong', 'u', 'ul', 'video']:
+            'strong', 'u', 'ul', 'video']:
             return
         global markup
         markup += "</{}>".format(tag)
@@ -110,11 +109,11 @@ def add(update, context):
     context.bot.send_message(
         chat_id=chat_id, text="Added to queue! processing...")
     links = find(text)
-    if links == []:  # and update.message.chat.type == "supergroup":
+    if not links:  # and update.message.chat.type == "super_group":
         pass
     else:
-        url = links[0]
-        text = requests.get(url).text
+        link = links[0]
+        text = requests.get(link).text
     context.chat_data[chat_id] = text
     context.bot.send_message(chat_id=chat_id, text="Ready! 👍🏻")
 
@@ -133,7 +132,6 @@ def ask(update, context):
 
 
 def translate(link):
-
     global url
     global text_nodes
     global text_strings
@@ -141,7 +139,7 @@ def translate(link):
 
     dest = "en"
     url = link
-    parser = MyHTMLParser()
+    parser = html_parser()
     response = requests.get(url)
     doc = Document(response.text)
     # tree = fromstring(r.content)
@@ -188,41 +186,36 @@ def translate(link):
 
 
 def find(string):
-    url = re.findall(
+    link = re.findall(
         'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(), ]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', string)
-    return url
+    return link
 
 
 def screenshot(update, context):
     chat_id = update.message.chat_id
-    url = context.args[0]
-    photo = "https://api.microlink.io/?url={}&waitUntil=networkidle2&screenshot=true&meta=false&embed=screenshot.url".format(
-        url)
+    link = context.args[0]
+    photo = f"https://api.microlink.io/?url={link}&waitUntil=networkidle2&screenshot=true&meta=false&embed=screenshot.url"
     context.bot.send_photo(chat_id=chat_id, photo=photo)
 
 
-def fullshot(update, context):
+def full_screenshot(update, context):
     chat_id = update.message.chat_id
-    url = context.args[0]
-    file = "https://api.microlink.io/?url={}&waitUntil=networkidle2&screenshot=true&meta=false&embed=screenshot.url&fullPage=true".format(
-        url)
+    link = context.args[0]
+    file = f"https://api.microlink.io/?url={link}&waitUntil=networkidle2&screenshot=true&meta=false&embed=screenshot.url&fullPage=true"
     context.bot.send_document(chat_id=chat_id, document=file)
 
 
 def pdf(update, context):
     chat_id = update.message.chat_id
-    url = context.args[0]
-    file = "https://api.microlink.io/?url={}&pdf&embed=pdf.url&scale=1&margin=0.4cm".format(
-        url)
+    link = context.args[0]
+    file = f"https://api.microlink.io/?url={link}&pdf&embed=pdf.url&scale=1&margin=0.4cm"
     context.bot.send_document(chat_id=chat_id, document=file)
 
 
 def technologies(update, context):
     chat_id = update.message.chat_id
-    link = context.args[0]
-    url = "https://api.microlink.io/?url={}&meta=false&insights.lighthouse=false&insights.technologies=true".format(
-        link)
-    result = requests.get(url).json()
+    link = f"https://api.microlink.io/?url={context.args[0]}&meta=false&insights.lighthouse=false&insights.technologies=true"
+    result = requests.get(link).json()
 
     tech_list = result['data']['insights']['technologies']
     len_tech = len(tech_list)
@@ -231,19 +224,19 @@ def technologies(update, context):
         for n, tech in enumerate(tech_list):
             if n < len_tech - 1:
                 string += "├ " + str(tech['name']) + \
-                    ' - ' + str(tech['categories'][0]) + "\n"
+                          ' - ' + str(tech['categories'][0]) + "\n"
             else:
                 string += "└ " + str(tech['name']) + \
-                    ' - ' + str(tech['categories'][0])
+                          ' - ' + str(tech['categories'][0])
     else:
         string += "└ " + str(tech_list[0]['name']) + \
-            ' - ' + str(tech_list[0]['categories'][0]) + "\n"
+                  ' - ' + str(tech_list[0]['categories'][0]) + "\n"
 
     context.bot.send_message(chat_id=chat_id, text="<b>Detected {} technologies behind the site:</b>\n{}".format(
         len_tech, string), parse_mode=telegram.ParseMode.HTML)
 
 
-def help(update, context):
+def help_response(update, context):
     update.message.reply_text("""commands
 
 pdf - export url as pdf
@@ -255,7 +248,9 @@ ask - followed by question you want to ask (can be used as reply too)""")
 
 def alternative(update, context):
     query = ' '.join(context.args)
+    print(query)
     response = fetch(query)
+    print(response)
     update.message.reply_text(response)
 
 
@@ -265,12 +260,12 @@ def fetch(query):
     altshow = ""
     tagshow = ""
     searched = query
-    urlsearched = "http://alternativeto.net/browse/search/?q="+searched+"&ignoreExactMatch=true"
+    urlsearched = "http://alternativeto.net/browse/search/?q=" + searched + "&ignoreExactMatch=true"
     searchedpage = requests.get(urlsearched)
     searchedtree = fromstring(searchedpage.content)
     searchedlink = searchedtree.xpath('//a[@data-link-action="Search"]/@href')
-    url = "http://alternativeto.net"+searchedlink[0]
-    page = requests.get(url)
+    link = "http://alternativeto.net" + searchedlink[0]
+    page = requests.get(link)
     tree = fromstring(page.content)
     title = tree.xpath('//h1[@itemprop="name"]/text()')
     tags = tree.xpath('//span[@class="label label-default"]/text()')
@@ -279,24 +274,28 @@ def fetch(query):
     alternativs = tree.xpath('//a[@data-link-action="Alternatives"]/text()')
     creatorwebsite = tree.xpath('//a[@class="ga_outgoing"]/@href')
     try:
-        post += "{}[{}]\n".format(title[0], creatorwebsite[0])+"\n"
+        post += "{}[{}]\n".format(title[0], creatorwebsite[0]) + "\n"
     except IndexError:
         post += title[0]
-    for x in range(0,len(platforms)):
-        if x is len(platforms)-1:
-            pltoshow += "└ "+platforms[x]+"\n"
+    print(post)
+    for x in range(0, len(platforms)):
+        if x is len(platforms) - 1:
+            pltoshow += "└ " + platforms[x] + "\n"
         else:
-            pltoshow += "├ "+platforms[x]+"\n"
-    post += "Platforms: "+"\n"+pltoshow+"\n"
-    for y in range(0,len(alternativs)):
-        if y is len(alternativs)-1:
-            altshow += "└ "+alternativs[y]+"\n"
+            pltoshow += "├ " + platforms[x] + "\n"
+    post += "Platforms: " + "\n" + pltoshow + "\n"
+    print(post)
+    for y in range(0, len(alternativs)):
+        if y is len(alternativs) - 1:
+            altshow += "└ " + alternativs[y] + "\n"
         else:
-            altshow += "├ "+alternativs[y]+"\n"
-    post += "Alternatives: "+"\n"+altshow+"\n"
-    for z in range(0,len(tags)):
-	tagshow += "#"+tags[z]+"\n"
-    post += "genres:"+"\n"+tagshow
+            altshow += "├ " + alternativs[y] + "\n"
+    post += "Alternatives: " + "\n" + altshow + "\n"
+    print(post)
+    for z in range(0, len(tags)):
+        tagshow += "#" + tags[z] + "\n"
+    post += "genres:" + "\n" + tagshow
+    print(post)
     return post
 
 
@@ -319,13 +318,13 @@ def build_menu(buttons, n_cols, header_buttons=None, footer_buttons=None):
 def process(update, context):
     links = find(update.message.text)
     # handling for groups, when message has no links
-    if links == []:  # and update.message.chat.type == "supergroup":
+    if not links:  # and update.message.chat.type == "super_group":
         return
     try:
-        url = links[0]
+        link = links[0]
     except:
         update.message.reply_text("Oh! Send a valid link.")
-    article = Article(url)
+    article = Article(link)
     article.download()
     article.parse()
     try:
@@ -345,22 +344,22 @@ def process(update, context):
     title = str(tree.findtext('.//title'))
     lang = translator.detect(title).lang
     if lang != 'en':
-        text = translate(url)
+        text = translate(link)
         if text == 'null':
             return
         update.message.reply_text(text)
-        url = find(text)[0]
-        article = Article(url)
+        link = find(text)[0]
+        article = Article(link)
         article.download()
         article.parse()
     text = article.text
     soup = bs(value, 'lxml')
     outline = ""
     for heading in soup.find_all(["h1", "h2", "h3", "h4", "h5", "h6"]):
-    	heading_text = heading.text.strip()
-    	if heading.name in ["h1", "h2"]:
-    		heading_text = f"*{heading_text}*"
-    	outline += int(heading.name[1:])*' ' + '- ' + heading_text + '\n'
+        heading_text = heading.text.strip()
+        if heading.name in ["h1", "h2"]:
+            heading_text = f"*{heading_text}*"
+        outline += int(heading.name[1:]) * ' ' + '- ' + heading_text + '\n'
     article.nlp()
     keywords = article.keywords
     tags = ""
@@ -372,7 +371,7 @@ def process(update, context):
         summary_points += "↦️ " + x + "\n"
     summary = summary_points
     read = readtime.of_text(text)
-    msg = f"""🔗 *Link:* {url}\n{author}{date}\n🚩 *Title: {title}*\n\n🗨 *Summary:*\n _{summary}_\n"""
+    msg = f"""🔗 *Link:* {link}\n{author}{date}\n🚩 *Title: {title}*\n\n🗨 *Summary:*\n _{summary}_\n"""
     msg += f"""🎋 *Outline: * \n{outline}\n"""
     msg += f"""🤔 *Reading Time:* {read}\n""".replace("min", "mins")
     msg += f"""📑 *Tags:* {tags}\n """
@@ -405,10 +404,10 @@ def main():
     updater = Updater(token, use_context=True)
     dp = updater.dispatcher
     dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(CommandHandler("help", help))
+    dp.add_handler(CommandHandler("help", help_response))
     dp.add_handler((CallbackQueryHandler(button)))
     dp.add_handler(CommandHandler("scr", screenshot))
-    dp.add_handler(CommandHandler("full", fullshot))
+    dp.add_handler(CommandHandler("full", full_screenshot))
     dp.add_handler(CommandHandler("pdf", pdf))
     dp.add_handler(CommandHandler("add", add))
     dp.add_handler(CommandHandler("ask", ask))
