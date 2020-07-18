@@ -253,6 +253,53 @@ add - store the passage to ask questions from
 ask - followed by question you want to ask (can be used as reply too)""")
 
 
+def alternative(update, context):
+    query = ' '.join(context.args)
+    response = fetch(query)
+    update.message.reply_text(response)
+
+
+def fetch(query):
+    post = ""
+    pltoshow = ""
+    altshow = ""
+    tagshow = ""
+    searched = query
+    urlsearched = "http://alternativeto.net/browse/search/?q="+searched+"&ignoreExactMatch=true"
+    searchedpage = requests.get(urlsearched)
+    searchedtree = fromstring(searchedpage.content)
+    searchedlink = searchedtree.xpath('//a[@data-link-action="Search"]/@href')
+    url = "http://alternativeto.net"+searchedlink[0]
+    page = requests.get(url)
+    tree = fromstring(page.content)
+    title = tree.xpath('//h1[@itemprop="name"]/text()')
+    tags = tree.xpath('//span[@class="label label-default"]/text()')
+    platforms = tree.xpath('//li[@class="label label-default "]/text()')
+    # image = tree.xpath('//div[@class="image-wrapper"]/img[@src]')
+    alternativs = tree.xpath('//a[@data-link-action="Alternatives"]/text()')
+    creatorwebsite = tree.xpath('//a[@class="ga_outgoing"]/@href')
+    try:
+        post += "{}[{}]\n".format(title[0], creatorwebsite[0])+"\n"
+    except IndexError:
+        post += title[0]
+    for x in range(0,len(platforms)):
+        if x is len(platforms)-1:
+            pltoshow += "└ "+platforms[x]+"\n"
+        else:
+            pltoshow += "├ "+platforms[x]+"\n"
+    post += "Platforms: "+"\n"+pltoshow+"\n"
+    for y in range(0,len(alternativs)):
+        if y is len(alternativs)-1:
+            altshow += "└ "+alternativs[y]+"\n"
+        else:
+            altshow += "├ "+alternativs[y]+"\n"
+    post += "Alternatives: "+"\n"+altshow+"\n"
+    for z in range(0,len(tags)):
+	tagshow += "#"+tags[z]+"\n"
+    post += "genres:"+"\n"+tagshow
+    return post
+
+
 def button(update, context):
     query = update.callback_query
     context.bot.answer_callback_query(
@@ -365,6 +412,7 @@ def main():
     dp.add_handler(CommandHandler("pdf", pdf))
     dp.add_handler(CommandHandler("add", add))
     dp.add_handler(CommandHandler("ask", ask))
+    dp.add_handler(CommandHandler("alt", alternative))
     dp.add_handler(CommandHandler("tech", technologies))
     dp.add_handler(MessageHandler(Filters.text, process))
     dp.add_error_handler(error)
