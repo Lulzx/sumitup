@@ -13,3 +13,4 @@ emoji
 readability-lxml
 html_telegraph_poster
 nltk
+sentry-sdk
