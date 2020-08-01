@@ -6,6 +6,8 @@ import logging
 import os
 import re
 import sys
+import sentry_sdk
+sentry_sdk.init("https://2ab3e5903a024548a0ceb3fc187aa6cd@o428516.ingest.sentry.io/5374032")
 import urllib.parse
 from functools import reduce
 from html.parser import HTMLParser
