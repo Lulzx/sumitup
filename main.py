@@ -255,7 +255,7 @@ def wolfram(update, context):
     text = context.args[0]
     user_question = quote(text, safe='')
     wolfram_key = os.environ.get("WOLFRAM_KEY")
-    url = f'http://api.wolframalpha.com/v2/query?appid={wolfram_key}&input=solve+{user_question}&podstate=Step-by-step%20solution'
+    url = f'http://api.wolframalpha.com/v2/query?appid={wolfram_key}&input={user_question}'
     answer = requests.get(url)
     soup = bs(answer.text, 'html.parser')
     images = soup.find_all('subpod')
