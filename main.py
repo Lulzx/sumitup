@@ -397,7 +397,7 @@ def process(update, context):
 
 def ocr(update, context):
     chat_id = update.message.chat.id
-    file_id = update.message.photo[0].file_id
+    file_id = update.message.photo[-1].file_id
     file_name = file_id + ".png"
     picture = context.bot.get_file(file_id).download('./data/{}'.format(file_name))
     try:
