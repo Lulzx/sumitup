@@ -9,6 +9,7 @@ import sys
 import sentry_sdk
 sentry_sdk.init("https://2ab3e5903a024548a0ceb3fc187aa6cd@o428516.ingest.sentry.io/5374032")
 import urllib.parse
+import pytesseract
 from functools import reduce
 from html.parser import HTMLParser
 
@@ -394,6 +395,23 @@ def process(update, context):
                                  parse_mode=telegram.ParseMode.MARKDOWN)
 
 
+def ocr(update, context):
+    chat_id = update.message.chat.id
+    file_id = update.message.photo[0].file_id
+    file_name = file_id + ".png"
+    picture = context.bot.get_file(file_id).download('./data/{}'.format(file_name))
+    try:
+        text = pytesseract.image_to_string('./data/{}'.format(file_name))
+        if text == "":
+            if update.message.chat.type == "supergroup":
+                return # won't show error messages in groups
+            else:
+                text = "sorry, unable to extract text from your image."
+    except:
+        text = "sorry, an error has occured while processing your image."
+    context.bot.send_message(chat_id=chat_id, text=text)
+    
+    
 def error(update, context):
     logger.warning('Update "%s" caused error "%s"' % (update, context.error))
 
@@ -408,6 +426,7 @@ def main():
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help_response))
     dp.add_handler((CallbackQueryHandler(button)))
+    dp.add_handler(MessageHandler(Filters.photo, ocr))
     dp.add_handler(CommandHandler("scr", screenshot))
     dp.add_handler(CommandHandler("full", full_screenshot))
     dp.add_handler(CommandHandler("pdf", pdf))
