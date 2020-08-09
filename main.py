@@ -249,6 +249,20 @@ add - store the passage to ask questions from
 ask - followed by question you want to ask (can be used as reply too)""")
 
 
+def wolfram(bot, update):
+    chat_id = update.message.chat_id
+    text = context.args[0]
+    user_question = quote(text, safe='')
+    wolfram_key = os.environ.get("WOLFRAM_KEY")
+    url = f'http://api.wolframalpha.com/v2/query?appid={wolfram_key}&input=solve+{user_question}&podstate=Step-by-step%20solution'
+    answer = requests.get(url)
+    soup = bs(answer.text, 'html.parser')
+    images = soup.find_all('subpod')
+    for image in images:
+        image_url = image.find('img')['src']
+        context.bot.send_photo(chat_id=chat_id, photo=image_url)
+
+
 def alternative(update, context):
     query = ' '.join(context.args)
     print(query)
@@ -432,6 +446,7 @@ def main():
     dp.add_handler(CommandHandler("pdf", pdf))
     dp.add_handler(CommandHandler("add", add))
     dp.add_handler(CommandHandler("ask", ask))
+    dp.add_handler(CommandHandler("wolfram", wolfram))
     dp.add_handler(CommandHandler("alt", alternative))
     dp.add_handler(CommandHandler("tech", technologies))
     dp.add_handler(MessageHandler(Filters.text, process))
