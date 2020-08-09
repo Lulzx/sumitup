@@ -3,6 +3,7 @@ telegraph
 newspaper3k
 markdown2
 readtime
+pytesseract
 bs4
 lxml
 requests
