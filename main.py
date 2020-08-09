@@ -20,6 +20,7 @@ import requests
 import telegram
 from bs4 import BeautifulSoup as bs
 from googletrans import Translator
+from urllib.parse import quote
 from html_telegraph_poster import TelegraphPoster
 from lxml.html import fromstring
 from newspaper import Article
