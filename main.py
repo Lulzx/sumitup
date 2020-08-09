@@ -249,7 +249,7 @@ add - store the passage to ask questions from
 ask - followed by question you want to ask (can be used as reply too)""")
 
 
-def wolfram(bot, update):
+def wolfram(update, context):
     chat_id = update.message.chat_id
     text = context.args[0]
     user_question = quote(text, safe='')
@@ -435,7 +435,7 @@ def main():
         token = sys.argv[1]
     except IndexError:
         token = os.environ.get("TOKEN")
-    updater = Updater(token)
+    updater = Updater(token, use_context=True)
     dp = updater.dispatcher
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help_response))
