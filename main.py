@@ -295,22 +295,22 @@ def fetch(query):
     except IndexError:
         post += title[0]
     print(post)
-    for x in range(0, len(platforms)):
+    for x, platform in enumerate(platforms):
         if x is len(platforms) - 1:
-            pltoshow += "└ " + platforms[x] + "\n"
+            pltoshow += "└ " + platform + "\n"
         else:
-            pltoshow += "├ " + platforms[x] + "\n"
+            pltoshow += "├ " + platform + "\n"
     post += "Platforms: " + "\n" + pltoshow + "\n"
     print(post)
-    for y in range(0, len(alternativs)):
+    for y, alternative in enumerate(alternativs):
         if y is len(alternativs) - 1:
-            altshow += "└ " + alternativs[y] + "\n"
+            altshow += "└ " + alternative + "\n"
         else:
-            altshow += "├ " + alternativs[y] + "\n"
+            altshow += "├ " + alternative + "\n"
     post += "Alternatives: " + "\n" + altshow + "\n"
     print(post)
-    for z in range(0, len(tags)):
-        tagshow += "#" + tags[z] + "\n"
+    for z, tag in enumerate(tags):
+        tagshow += "#" + tag + "\n"
     post += "genres:" + "\n" + tagshow
     print(post)
     return post
