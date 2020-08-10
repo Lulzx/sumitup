@@ -178,8 +178,7 @@ def translate(link):
     markup = re.sub(r'\s([?.!"](?:\s|$))', r'\1', markup)
     print("\n")
     # print(markup)
-    access_token = '0010fae64146e64e1f145470b866af'
-    access_token += 'c43e1f2221834eeffc8f3e4a901ac7'
+    access_token = os.environ.get("access_token")
     t = TelegraphPoster(
         access_token=access_token)
     article = t.post(title=str(title), author='lulz', text=str(markup))
