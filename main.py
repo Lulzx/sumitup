@@ -419,8 +419,7 @@ def ocr(update, context):
         if text == "":
             if update.message.chat.type == "supergroup":
                 return # won't show error messages in groups
-            else:
-                text = "sorry, unable to extract text from your image."
+            text = "sorry, unable to extract text from your image."
     except:
         text = "sorry, an error has occured while processing your image."
     context.bot.send_message(chat_id=chat_id, text=text)
