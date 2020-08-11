@@ -333,7 +333,11 @@ def build_menu(buttons, n_cols, header_buttons=None, footer_buttons=None):
 
 # noinspection PyBroadException
 def process(update, context):
-    links = find(update.message.text)
+    if update.message:
+        text = update.message.text
+    else:
+        return
+    links = find(text)
     # handling for groups, when message has no links
     if not links:  # and update.message.chat.type == "super_group":
         return
