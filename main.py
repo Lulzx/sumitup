@@ -6,26 +6,25 @@ import logging
 import os
 import re
 import sys
-import sentry_sdk
-sentry_sdk.init("https://2ab3e5903a024548a0ceb3fc187aa6cd@o428516.ingest.sentry.io/5374032")
 import urllib.parse
-import pytesseract
 from functools import reduce
 from html.parser import HTMLParser
+from urllib.parse import quote
+from urllib.parse import urljoin
 
 import emoji
 import nltk
+import pytesseract
 import readtime
 import requests
+import sentry_sdk
 import telegram
 from bs4 import BeautifulSoup as bs
 from googletrans import Translator
-from urllib.parse import quote
 from html_telegraph_poster import TelegraphPoster
 from lxml.html import fromstring
 from newspaper import Article
 from readability import Document
-from requests.compat import urljoin
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (Updater, CommandHandler,
                           MessageHandler, Filters, CallbackQueryHandler)
@@ -36,6 +35,8 @@ text_strings = []
 markup = """"""
 url = ""
 translator = Translator()
+
+sentry_sdk.init("https://2ab3e5903a024548a0ceb3fc187aa6cd@o428516.ingest.sentry.io/5374032")
 
 logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -53,7 +54,10 @@ add - store the passage to ask questions from
 ask - followed by question you want to ask (can be used as reply too)""")
 
 
-class html_parser(HTMLParser):
+class HtmlParser(HTMLParser):
+    def error(self, message):
+        pass
+
     def handle_starttag(self, tag, attrs):
         if tag not in [
             'a', 'aside', 'b', 'blockquote',
@@ -125,9 +129,9 @@ def add(update, context):
 def ask(update, context):
     chat_id = update.message.chat_id
     question = ' '.join(context.args)
-    try:
+    if update.message.reply_to_message:
         passage = update.message.reply_to_message.text
-    except:
+    else:
         passage = context.chat_data[chat_id]
     response = qa(question, passage)
     context.bot.send_message(
@@ -143,7 +147,7 @@ def translate(link):
 
     dest = "en"
     url = link
-    parser = html_parser()
+    parser = HtmlParser()
     response = requests.get(url)
     doc = Document(response.text)
     # tree = fromstring(r.content)
@@ -254,8 +258,8 @@ def wolfram(update, context):
     text = context.args[0]
     user_question = quote(text, safe='')
     wolfram_key = os.environ.get("WOLFRAM_KEY")
-    url = f'http://api.wolframalpha.com/v2/query?appid={wolfram_key}&input={user_question}'
-    answer = requests.get(url)
+    link = f'http://api.wolframalpha.com/v2/query?appid={wolfram_key}&input={user_question}'
+    answer = requests.get(link)
     soup = bs(answer.text, 'html.parser')
     images = soup.find_all('subpod')
     for image in images:
@@ -341,10 +345,11 @@ def process(update, context):
     # handling for groups, when message has no links
     if not links:  # and update.message.chat.type == "super_group":
         return
-    try:
-        link = links[0]
-    except:
-        update.message.reply_text("Oh! Send a valid link.")
+    link = links[0]
+    # try:
+    #     link = links[0]
+    # except:
+    #     update.message.reply_text("Oh! Send a valid link.")
     article = Article(link)
     article.download()
     article.parse()
@@ -422,13 +427,13 @@ def ocr(update, context):
         text = pytesseract.image_to_string('./data/{}'.format(file_name))
         if text == "":
             if update.message.chat.type == "supergroup":
-                return # won't show error messages in groups
+                return  # won't show error messages in groups
             text = "sorry, unable to extract text from your image."
     except:
         text = "sorry, an error has occured while processing your image."
     context.bot.send_message(chat_id=chat_id, text=text)
-    
-    
+
+
 def error(update, context):
     logger.warning('Update "%s" caused error "%s"' % (update, context.error))
 
