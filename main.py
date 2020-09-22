@@ -17,7 +17,6 @@ import nltk
 import pytesseract
 import readtime
 import requests
-import sentry_sdk
 import telegram
 from bs4 import BeautifulSoup as bs
 from googletrans import Translator
@@ -35,8 +34,6 @@ text_strings = []
 markup = """"""
 url = ""
 translator = Translator()
-
-sentry_sdk.init("https://2ab3e5903a024548a0ceb3fc187aa6cd@o428516.ingest.sentry.io/5374032")
 
 logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
